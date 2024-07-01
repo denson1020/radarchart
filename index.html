@@ -83,7 +83,7 @@
     <div id="settings">
         <div class="input-group">
             <label for="chartTitle">チャートタイトル:</label>
-            <input type="text" id="chartTitle" value="カスタムレーダーチャート">
+            <input type="text" id="chartTitle" value="名前">
         </div>
         <div class="input-group">
             <label for="itemCount">項目数:</label>
@@ -157,11 +157,10 @@
             for (let i = 0; i < count; i++) {
                 const inputGroup = document.createElement('div');
                 inputGroup.className = 'slider-group';
-                inputGroup.innerHTML = `
-                    <label for="value${i + 1}">項目${String.fromCharCode(65 + i)}:</label>
+                inputGroup.innerHTML = 
+                    `<label for="value${i + 1}">${String.fromCharCode(65 + i)}:</label>
                     <input type="range" id="value${i + 1}" min="1" max="5" value="3">
-                    <span id="value${i + 1}Text">3</span>
-                `;
+                    <span id="value${i + 1}Text">3</span>`;
                 inputsDiv.appendChild(inputGroup);
             }
         }
