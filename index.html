@@ -159,7 +159,7 @@
                 inputGroup.className = 'slider-group';
                 inputGroup.innerHTML = 
                     `<label for="value${i + 1}">${String.fromCharCode(65 + i)}:</label>
-                    <input type="range" id="value${i + 1}" min="1" max="5" value="3">
+                    <input type="range" id="value${i + 1}" min="1" max="5" value="3" onchange="updateChart()">
                     <span id="value${i + 1}Text">3</span>`;
                 inputsDiv.appendChild(inputGroup);
             }
@@ -168,9 +168,8 @@
         function updateChart() {
             const title = document.getElementById('chartTitle').value;
             const itemCount = parseInt(document.getElementById('itemCount').value, 10);
-            const labels = [];
+            const labels = ['トルク', '値段', '見た目', 'ノイズ', '風圧'].slice(0, itemCount);
             for (let i = 0; i < itemCount; i++) {
-                labels.push(String.fromCharCode(65 + i)); // A, B, C, D, E に変更
                 document.getElementById(`value${i + 1}Text`).textContent = document.getElementById(`value${i + 1}`).value;
             }
             const data = Array.from(document.querySelectorAll('#inputs input')).map(input => input.value);
@@ -185,11 +184,6 @@
             const itemCount = parseInt(document.getElementById('itemCount').value, 10);
             createInputs(itemCount);
             updateChart();
-
-            const inputs = document.querySelectorAll('#inputs input');
-            inputs.forEach(input => {
-                input.addEventListener('input', updateChart);
-            });
         });
         document.getElementById('backgroundColor').addEventListener('input', updateChart);
         document.getElementById('borderColor').addEventListener('input', updateChart);
@@ -197,11 +191,6 @@
         // 初期表示
         createInputs(5); // 初期項目数を5に設定
         updateChart();
-
-        const inputs = document.querySelectorAll('#inputs input');
-        inputs.forEach(input => {
-            input.addEventListener('input', updateChart);
-        });
     </script>
 </body>
 </html>
