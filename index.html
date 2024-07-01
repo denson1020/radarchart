@@ -146,7 +146,7 @@
         function createInputs(count) {
             const inputsDiv = document.getElementById('inputs');
             inputsDiv.innerHTML = '';
-            const labels = ['トルク', '値段', '見た目', 'ノイズ', '風圧'];
+            const labels = ['顔', 'スタイル', '性格', 'エロさ', 'テクニック'];
             for (let i = 0; i < count; i++) {
                 const inputGroup = document.createElement('div');
                 inputGroup.className = 'slider-group';
@@ -161,7 +161,7 @@
         function updateChart() {
             const title = document.getElementById('chartTitle').value;
             const itemCount = parseInt(document.getElementById('itemCount').value, 10);
-            const labels = ['トルク', '値段', '見た目', 'ノイズ', '風圧'].slice(0, itemCount);
+            const labels = ['顔', 'スタイル', '性格', 'エロさ', 'テクニック'].slice(0, itemCount);
             for (let i = 0; i < itemCount; i++) {
                 document.getElementById(`value${i + 1}Text`).textContent = document.getElementById(`value${i + 1}`).value;
             }
