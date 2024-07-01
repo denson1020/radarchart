@@ -53,8 +53,9 @@
             margin-bottom: 10px;
         }
         .slider-group label {
-            margin: 0 10px 0 0;
-            flex: 1;
+        margin: 0 10px 0 0;
+        flex: 1;
+        writing-mode: horizontal-tb;
         }
         .slider-group span {
             flex: 1;
@@ -98,15 +99,6 @@
                 <option value="10">10</option>
             </select>
         </div>
-        <!-- Removed itemNames section -->
-        <div class="input-group">
-            <label for="backgroundColor">背景色:</label>
-            <input type="color" id="backgroundColor" value="#36A2EB">
-        </div>
-        <div class="input-group">
-            <label for="borderColor">境界線の色:</label>
-            <input type="color" id="borderColor" value="#36A2EB">
-        </div>
     </div>
     <div id="inputs"></div>
 
@@ -114,7 +106,7 @@
     <script>
         let radarChart;
 
-        function createChart(labels, data, title, backgroundColor, borderColor) {
+        function createChart(labels, data, title) {
             const ctx = document.getElementById('radarChart').getContext('2d');
             if (radarChart) radarChart.destroy();
             radarChart = new Chart(ctx, {
@@ -124,9 +116,9 @@
                     datasets: [{
                         label: title,
                         data: data,
-                        backgroundColor: backgroundColor,
-                        borderColor: borderColor,
-                        borderWidth: 1
+                        backgroundColor: 'rgba(255, 192, 203, 0.3)', // 半透明の薄いピンク
+                        borderColor: '#FF69B4', // 濃いピンク
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -154,11 +146,12 @@
         function createInputs(count) {
             const inputsDiv = document.getElementById('inputs');
             inputsDiv.innerHTML = '';
+            const labels = ['トルク', '値段', '見た目', 'ノイズ', '風圧'];
             for (let i = 0; i < count; i++) {
                 const inputGroup = document.createElement('div');
                 inputGroup.className = 'slider-group';
                 inputGroup.innerHTML = 
-                    `<label for="value${i + 1}">${String.fromCharCode(65 + i)}:</label>
+                    `<label for="value${i + 1}">${labels[i]}:</label>
                     <input type="range" id="value${i + 1}" min="1" max="5" value="3" onchange="updateChart()">
                     <span id="value${i + 1}Text">3</span>`;
                 inputsDiv.appendChild(inputGroup);
@@ -173,10 +166,8 @@
                 document.getElementById(`value${i + 1}Text`).textContent = document.getElementById(`value${i + 1}`).value;
             }
             const data = Array.from(document.querySelectorAll('#inputs input')).map(input => input.value);
-            const backgroundColor = document.getElementById('backgroundColor').value + '33'; // 透明度を追加
-            const borderColor = document.getElementById('borderColor').value;
 
-            createChart(labels, data, title, backgroundColor, borderColor);
+            createChart(labels, data, title);
         }
 
         document.getElementById('chartTitle').addEventListener('input', updateChart);
@@ -185,8 +176,6 @@
             createInputs(itemCount);
             updateChart();
         });
-        document.getElementById('backgroundColor').addEventListener('input', updateChart);
-        document.getElementById('borderColor').addEventListener('input', updateChart);
 
         // 初期表示
         createInputs(5); // 初期項目数を5に設定
