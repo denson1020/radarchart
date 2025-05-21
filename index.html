@@ -1,185 +1,197 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>カスタマイズ可能なレーダーチャート</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #chart-container {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px 0;
-        }
-        #settings {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-            background: #f7f7f7;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .input-group {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        .input-group label {
-            margin-bottom: 5px;
-        }
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .slider-group {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .slider-group label {
-        margin: 0 10px 0 0;
-        flex: 1;
-        writing-mode: horizontal-tb;
-        }
-        .slider-group span {
-            flex: 1;
-            text-align: left;
-            margin-left: 10px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自転車ステータス - グランヴァン横濱クレストシティ & ヴィラコンフォート</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #1e1e2f;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .station-card {
+      background: #2c2c3c;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      margin-bottom: 30px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .station-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .bike-status {
+      font-size: 2rem;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #6ef1c2;
+    }
+
+    .bike-icons {
+      margin: 20px 0;
+      font-size: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .bike-icons span {
+      transition: transform 0.2s ease;
+    }
+
+    .bike-icons span:hover {
+      transform: scale(1.2);
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      color: #bbb;
+      margin-top: 10px;
+    }
+
+    #refresh-button {
+      margin: 20px auto;
+      padding: 12px 30px;
+      font-size: 1rem;
+      background: linear-gradient(to right, #43e97b, #38f9d7);
+      color: #1e1e2f;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      display: block;
+    }
+
+    #refresh-button:hover {
+      box-shadow: 0 0 10px rgba(72, 239, 206, 0.6);
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .station-card {
+        padding: 20px;
+      }
+      .station-card h2 {
+        font-size: 1.2rem;
+      }
+      .bike-status {
+        font-size: 1.5rem;
+      }
+      .bike-icons {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="chart-container">
-        <canvas id="radarChart"></canvas>
+  <div class="container">
+    <div class="station-card" id="station-6569">
+      <h2>グランヴァン横濱クレストシティ</h2>
+      <div class="bike-status" id="bike-status-6569">情報を取得中...</div>
+      <div class="bike-icons" id="bike-icons-6569"></div>
+      <div class="last-updated" id="last-updated-6569"></div>
     </div>
-    <div id="settings">
-        <div class="input-group">
-            <label for="chartTitle">チャートタイトル:</label>
-            <input type="text" id="chartTitle" value="名前">
-        </div>
-        <div class="input-group">
-            <label for="itemCount">項目数:</label>
-            <select id="itemCount">
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5" selected>5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-            </select>
-        </div>
+
+    <div class="station-card" id="station-15389">
+      <h2>ヴィラコンフォート</h2>
+      <div class="bike-status" id="bike-status-15389">情報を取得中...</div>
+      <div class="bike-icons" id="bike-icons-15389"></div>
+      <div class="last-updated" id="last-updated-15389"></div>
     </div>
-    <div id="inputs"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        let radarChart;
+    <button id="refresh-button">🔄 更新</button>
+  </div>
 
-        function createChart(labels, data, title) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            if (radarChart) radarChart.destroy();
-            radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: title,
-                        data: data,
-                        backgroundColor: 'rgba(255, 192, 203, 0.3)', // 半透明の薄いピンク
-                        borderColor: '#FF69B4', // 濃いピンク
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: {
-                                display: true
-                            },
-                            min: 1,
-                            max: 5,
-                            stepSize: 1, // 刻みを1に設定
-                            ticks: {
-                                callback: function(value) {
-                                    if (Number.isInteger(value)) {
-                                        return value;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+  <script>
+    const stations = [
+      { id: "6569", name: "グランヴァン横濱クレストシティ", capacity: 8 },
+      { id: "15389", name: "ヴィラコンフォート", capacity: 6 }
+    ];
 
-        function createInputs(count) {
-            const inputsDiv = document.getElementById('inputs');
-            inputsDiv.innerHTML = '';
-            const labels = ['顔', 'スタイル', '性格', 'エロさ', 'テクニック'];
-            for (let i = 0; i < count; i++) {
-                const inputGroup = document.createElement('div');
-                inputGroup.className = 'slider-group';
-                inputGroup.innerHTML = 
-                    `<label for="value${i + 1}">${labels[i]}:</label>
-                    <input type="range" id="value${i + 1}" min="1" max="5" value="3" onchange="updateChart()">
-                    <span id="value${i + 1}Text">3</span>`;
-                inputsDiv.appendChild(inputGroup);
+    async function fetchBikeData() {
+      try {
+        const res = await fetch("https://api-public.odpt.org/api/v4/gbfs/hellocycling/station_status.json");
+        const json = await res.json();
+        const stationData = json.data.stations;
+
+        stations.forEach(station => {
+          const statusElem = document.getElementById(`bike-status-${station.id}`);
+          const iconsElem = document.getElementById(`bike-icons-${station.id}`);
+          const updatedElem = document.getElementById(`last-updated-${station.id}`);
+
+          const stationStatus = stationData.find(s => s.station_id === station.id);
+
+          if (stationStatus) {
+            const available = stationStatus.num_bikes_available;
+            const docksAvailable = stationStatus.num_docks_available;
+            const unavailable = station.capacity - available;
+
+            statusElem.textContent = `利用可能: ${available}台 / 返却可能: ${docksAvailable}台`;
+
+            iconsElem.innerHTML = "";
+            for (let i = 0; i < available; i++) {
+              const icon = document.createElement("span");
+              icon.textContent = "🚲";
+              iconsElem.appendChild(icon);
             }
-        }
-
-        function updateChart() {
-            const title = document.getElementById('chartTitle').value;
-            const itemCount = parseInt(document.getElementById('itemCount').value, 10);
-            const labels = ['顔', 'スタイル', '性格', 'エロさ', 'テクニック'].slice(0, itemCount);
-            for (let i = 0; i < itemCount; i++) {
-                document.getElementById(`value${i + 1}Text`).textContent = document.getElementById(`value${i + 1}`).value;
+            for (let i = 0; i < unavailable; i++) {
+              const icon = document.createElement("span");
+              icon.textContent = "🚲";
+              icon.style.opacity = "0.2";
+              iconsElem.appendChild(icon);
             }
-            const data = Array.from(document.querySelectorAll('#inputs input')).map(input => input.value);
 
-            createChart(labels, data, title);
-        }
-
-        document.getElementById('chartTitle').addEventListener('input', updateChart);
-        document.getElementById('itemCount').addEventListener('input', () => {
-            const itemCount = parseInt(document.getElementById('itemCount').value, 10);
-            createInputs(itemCount);
-            updateChart();
+            const lastReported = stationStatus.last_reported;
+            const updatedDate = new Date(lastReported * 1000);
+            updatedElem.textContent = `最終更新: ${updatedDate.toLocaleString('ja-JP')}`;
+          } else {
+            statusElem.textContent = "ステーション情報が見つかりません。";
+            iconsElem.innerHTML = "";
+            updatedElem.textContent = "";
+          }
         });
+      } catch (err) {
+        console.error(err);
+        stations.forEach(station => {
+          document.getElementById(`bike-status-${station.id}`).textContent = "情報取得に失敗しました。";
+          document.getElementById(`bike-icons-${station.id}`).innerHTML = "";
+          document.getElementById(`last-updated-${station.id}`).textContent = "";
+        });
+      }
+    }
 
-        // 初期表示
-        createInputs(5); // 初期項目数を5に設定
-        updateChart();
-    </script>
+    document.getElementById("refresh-button").addEventListener("click", fetchBikeData);
+
+    fetchBikeData();
+    setInterval(fetchBikeData, 60000);
+  </script>
 </body>
 </html>
