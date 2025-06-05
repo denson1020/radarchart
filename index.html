@@ -71,6 +71,35 @@
       margin-top: 10px;
     }
 
+    .add-station-form {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    #station-id-input {
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: none;
+      width: 160px;
+    }
+
+    #add-station-button {
+      padding: 8px 20px;
+      background: linear-gradient(to right, #43e97b, #38f9d7);
+      color: #1e1e2f;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    #add-station-button:hover {
+      box-shadow: 0 0 10px rgba(72, 239, 206, 0.6);
+    }
+
     #refresh-button {
       margin: 20px auto;
       padding: 12px 30px;
@@ -111,8 +140,12 @@
     }
   </style>
 </head>
-<body>
-  <div class="container">
+  <body>
+    <div class="container">
+      <div class="add-station-form">
+        <input id="station-id-input" type="text" placeholder="ステーションIDを入力">
+        <button id="add-station-button">追加</button>
+      </div>
     <div class="station-card" id="station-6569">
       <h2>グランヴァン横濱クレストシティ</h2>
       <div class="bike-status" id="bike-status-6569">情報を取得中...</div>
@@ -135,6 +168,34 @@
       { id: "6569", name: "グランヴァン横濱クレストシティ", capacity: 8 },
       { id: "15389", name: "ヴィラコンフォート", capacity: 6 }
     ];
+
+    const stationInfoMap = {};
+
+    async function fetchStationInfo() {
+      try {
+        const res = await fetch("https://api-public.odpt.org/api/v4/gbfs/hellocycling/station_information.json");
+        const json = await res.json();
+        json.data.stations.forEach(info => {
+          stationInfoMap[info.station_id] = info;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function createStationCard(id, name) {
+      const card = document.createElement("div");
+      card.className = "station-card";
+      card.id = `station-${id}`;
+      card.innerHTML = `
+        <h2>${name}</h2>
+        <div class="bike-status" id="bike-status-${id}">情報を取得中...</div>
+        <div class="bike-icons" id="bike-icons-${id}"></div>
+        <div class="last-updated" id="last-updated-${id}"></div>
+      `;
+      const container = document.querySelector(".container");
+      container.insertBefore(card, document.getElementById("refresh-button"));
+    }
 
     async function fetchBikeData() {
       try {
@@ -190,8 +251,25 @@
 
     document.getElementById("refresh-button").addEventListener("click", fetchBikeData);
 
-    fetchBikeData();
-    setInterval(fetchBikeData, 60000);
+    document.getElementById("add-station-button").addEventListener("click", () => {
+      const id = document.getElementById("station-id-input").value.trim();
+      if (!id || stations.some(s => s.id === id)) return;
+      const info = stationInfoMap[id];
+      if (!info) {
+        alert("ステーション情報が見つかりません");
+        return;
+      }
+      stations.push({ id, name: info.name, capacity: info.capacity });
+      createStationCard(id, info.name);
+      document.getElementById("station-id-input").value = "";
+      fetchBikeData();
+    });
+
+    (async () => {
+      await fetchStationInfo();
+      fetchBikeData();
+      setInterval(fetchBikeData, 60000);
+    })();
   </script>
 </body>
 </html>
